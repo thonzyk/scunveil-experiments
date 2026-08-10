@@ -1,3 +1,11 @@
+# Local data and training outputs
+/workspace/src/experiments/scFoundation
+data/
+results/
+checkpoints/
+runs/
+wandb/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
