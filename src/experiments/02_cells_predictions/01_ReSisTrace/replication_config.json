@@ -1,0 +1,18 @@
+{
+  "output_root": "/workspace/results/analysis/ReSisTrace",
+  "run_name": "end_to_end",
+  "model_version": "2026-10-02_11-54-21_w64",
+  "retention_rates": [1.0, 0.1, 0.01],
+  "seed": 223003,
+  "calibration_fraction": 0.2,
+  "calibration_folds": 3,
+  "train_fraction": 0.6,
+  "dev_fraction": 0.2,
+  "test_fraction": 0.2,
+  "c_values": [0.00001, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0],
+  "max_iter": 3000,
+  "batch_size": 128,
+  "threads": 8,
+  "device": "auto",
+  "save_models": true
+}

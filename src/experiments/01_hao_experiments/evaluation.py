@@ -43,7 +43,7 @@ def train_dev_test_split(X, obs, lbl_key, split_key, dev_ratio=0.5, random_state
     y = _labels(obs, lbl_key, X.shape[0])
     groups, shuffled = _groups(obs, split_key, X.shape[0], random_state)
     test_group, remaining = shuffled[:1], shuffled[1:]
-    n_dev = round(len(remaining) * dev_ratio)
+    n_dev = int(np.floor(len(remaining) * dev_ratio))
 
     is_test = np.isin(groups, test_group)
     is_dev = np.isin(groups, remaining[:n_dev])

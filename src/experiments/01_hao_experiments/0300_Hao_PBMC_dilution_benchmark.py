@@ -211,9 +211,9 @@ def load_scunveil_embeddings(adata):
     from constants import SC_UNVEIL_VERSION
 
     scUNVEIL = scUnveil(model_version=SC_UNVEIL_VERSION)
-    scUNVEIL.set_input_anndata(adata, batch_size=1000)
+    result = scUNVEIL.process_anndata(adata, batch_size=1000)
 
-    return scUNVEIL.get_embeddings(n_features=None)
+    return result.get_embeddings(n_features=None)
 
 
 def build_representation(method, adata, diluted_counts):

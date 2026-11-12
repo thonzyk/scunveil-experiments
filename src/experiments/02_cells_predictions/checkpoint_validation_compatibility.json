@@ -1,0 +1,14 @@
+{
+  "files": {
+    "benchmark_features.py": {
+      "actual_sha256": "57e2df07ac91b5ff61b7c67036592a9bfe92672601028f4bc13b67b154c9359a",
+      "canonical_sha256": "7d555cd19ea0843324c7f0dc95955ce7589e1e61918ec5e30430fc48c11b280e"
+    },
+    "benchmark_runner.py": {
+      "actual_sha256": "bc659c7e7e13e8794f5413453d4b03ff965c5b05d2f83b99386540099c713597",
+      "canonical_sha256": "57bbbc358b880bdbf5e81abb75298dc51a24cbb16efe5ce2aae7ba51c62bc05b"
+    }
+  },
+  "reason": "Selected-checkpoint provenance validation only: ignore unrelated model directories, verify selected files; no feature values, solver, split, calibration or scoring changes.",
+  "validator_sha256": "5ebdc9b1b15a41cf6a00519c7c1711578ce8599c3c461ac7f646a3d56c0ed217"
+}

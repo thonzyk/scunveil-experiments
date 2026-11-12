@@ -1,7 +1,7 @@
 import os
 # Set to True to force CPU-only execution for CPU-runtime measurements.
 # Set to False to allow to use available GPUs.
-FORCE_CPU_ONLY = False
+FORCE_CPU_ONLY = True
 if FORCE_CPU_ONLY:
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
@@ -15,10 +15,10 @@ from constants import DATA_ROOT, PBMC_50_MARKERS, EMB_NAME, IMPUTE_NAME, TIMING_
 
 from scunveil import scUnveil
 
-BATCH_SIZE = 10_000
+BATCH_SIZE = 1_000
 LIMIT_N_CELLS = None  # Set to an integer for a smoke test.
 
-scUNVEIL = scUnveil(model_version="2026-07-17_11-24-59_linear")
+scUNVEIL = scUnveil(model_version="2026-10-05_16-51-30_linear")
 
 collections_root = DATA_ROOT / "downstream_datasets"
 
@@ -49,12 +49,12 @@ for collection_path in sorted(collections_root.iterdir()):
         )
 
     time_start = time.time()
-    scUNVEIL.set_input_anndata(collection_adata, batch_size=BATCH_SIZE)
+    result = scUNVEIL.process_anndata(collection_adata, batch_size=BATCH_SIZE)
 
-    embeddings = scUNVEIL.get_embeddings(n_features=None)
+    embeddings = result.get_embeddings(n_features=None)
     time_emb = time.time() - time_start
 
-    marker_imputation = scUNVEIL.get_specific_genes_imputation(PBMC_50_MARKERS, batch_size=BATCH_SIZE)
+    marker_imputation = result.get_specific_genes_imputation(PBMC_50_MARKERS, batch_size=BATCH_SIZE)
     time_impute = time.time() - time_start
 
     if collection_path.name == 'Hao_PBMC' and FORCE_CPU_ONLY and LIMIT_N_CELLS is None:
@@ -66,8 +66,8 @@ for collection_path in sorted(collections_root.iterdir()):
             )
 
         with open(TIMING_PATH, 'a', encoding='utf-8') as fwa:
-            print(f'scUNVEIL_emb\t{time_emb}', file=fwa)
-            print(f'scUNVEIL_impute\t{time_impute}', file=fwa)
+            print(f'scUNVEIL_emb_lin\t{time_emb}', file=fwa)
+            print(f'scUNVEIL_impute_lin\t{time_impute}', file=fwa)
 
 
     if LIMIT_N_CELLS is None:

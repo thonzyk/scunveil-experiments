@@ -117,6 +117,44 @@ class BestValidationCheckpoint(tf.keras.callbacks.Callback):
             self.weights = self.model.get_weights()
 
 
+class ProjectedLossEarlyStopping(tf.keras.callbacks.Callback):
+    """Prune LR-sweep runs using the last 20 validation losses after 50 epochs."""
+
+    def __init__(self, reference_loss, epochs):
+        super().__init__()
+        self.reference_loss = reference_loss
+        self.epochs = epochs
+        self.losses = []
+        self.best_loss = np.inf
+        self.streak = 0
+
+    def on_epoch_end(self, epoch, logs=None):
+        loss = (logs or {}).get('val_loss')
+        if loss is None or not np.isfinite(loss):
+            self.losses.clear()
+            self.streak = 0
+            return
+        self.best_loss = min(self.best_loss, float(loss))
+        self.losses = (self.losses + [float(loss)])[-20:]
+        if epoch + 1 < 50 or len(self.losses) < 20:
+            return
+        slope, intercept = np.polyfit(np.arange(20), self.losses, 1)
+        fitted_loss = intercept + slope * 19
+        optimistic = fitted_loss + 1 * min(slope, 0) * (self.epochs - epoch - 1)
+        margin = max(1e-4, 0.01 * abs(self.reference_loss))
+        uncompetitive = (self.best_loss > self.reference_loss
+                         and optimistic > self.reference_loss + margin)
+        self.streak = self.streak + 1 if uncompetitive else 0
+        if self.streak >= 3:
+            print(
+                f'\nLR sweep pruning at epoch {epoch + 1}: '
+                f'current val_loss={loss:.6g}, higher-LR reference={self.reference_loss:.6g}, '
+                f'fitted val_loss={fitted_loss:.6g}, slope={slope:.6g}/epoch, '
+                f'optimistic val_loss at epoch {self.epochs}={optimistic:.6g}.'
+            )
+            self.model.stop_training = True
+
+
 def format_lr(value):
     return f'{float(value):.3e}'
 
@@ -201,7 +239,8 @@ def load_train_dev_test(method, random_state=None):
     )
 
 
-def fit_probe(x_train, y_train, x_val, y_val, n_features, n_classes, lr, epochs):
+def fit_probe(x_train, y_train, x_val, y_val, n_features, n_classes, lr, epochs,
+              reference_loss=np.inf):
     tf.keras.backend.clear_session()
     model = init_linear_model(n_features, n_classes, lr)
     best = BestValidationCheckpoint()
@@ -221,6 +260,8 @@ def fit_probe(x_train, y_train, x_val, y_val, n_features, n_classes, lr, epochs)
                 mode='min',
                 restore_best_weights=False,
             ),
+            *([ProjectedLossEarlyStopping(reference_loss, epochs)]
+              if np.isfinite(reference_loss) else []),
         ],
         verbose=1,
     )
@@ -360,9 +401,18 @@ def next_cell_typing_method():
 
 def run_sweep(method, lr):
     print(f'LR sweep: {method}, lr={format_lr(lr)}')
+    reference_loss = np.inf
+    for row in read_tsv(LR_SWEEP_PATH):
+        try:
+            loss = float(row['best_test_loss'])  # Historical name: validation loss.
+            if (row['representation_type'] == method and float(row['learning_rate']) > lr
+                    and np.isfinite(loss) and loss >= 0):
+                reference_loss = min(reference_loss, loss)
+        except (KeyError, TypeError, ValueError):
+            continue
     np.random.seed(42)
     data = load_train_test(method, random_state=42)
-    model, best = fit_probe(*data, lr, SWEEP_EPOCHS)
+    model, best = fit_probe(*data, lr, SWEEP_EPOCHS, reference_loss=reference_loss)
 
     append_tsv(LR_SWEEP_PATH, LR_SWEEP_FIELDS, {
         'representation_type': method,

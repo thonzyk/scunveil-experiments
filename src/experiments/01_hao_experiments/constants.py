@@ -8,7 +8,7 @@ ANALYSIS_ROOT.mkdir(parents=True, exist_ok=True)
 TIMING_PATH = ANALYSIS_ROOT / 'time_to_produce.tsv'
 
 CENSUS_VERSION = '2025-11-08'
-SC_UNVEIL_VERSION = '2026-07-09_18-42-14_full'
+SC_UNVEIL_VERSION = '2026-10-02_11-54-21_w64'
 
 EMB_NAME = 'embeddings'
 IMPUTE_NAME = 'imputation'

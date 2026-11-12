@@ -1,0 +1,39 @@
+{
+  "output_root": "/workspace/results/analysis/ReSisTrace",
+  "run_name": "retention",
+  "model_version": "2026-10-02_11-54-21_w64",
+  "embedding_dim": 512,
+  "train_cell_fraction": 1.0,
+  "train_umi_keep_probability": 1.0,
+  "depths": [
+    "full"
+  ],
+  "seed": 223003,
+  "c_values": [
+    1e-05,
+    0.0001,
+    0.001,
+    0.01,
+    0.1,
+    1.0,
+    10.0
+  ],
+  "inner_folds": 3,
+  "bootstrap_repeats": 0,
+  "permutation_repeats": 0,
+  "max_iter": 3000,
+  "batch_size": 128,
+  "threads": 8,
+  "device": "auto",
+  "protocol": "retention",
+  "retention_rates": [
+    1.0,
+    0.1,
+    0.01
+  ],
+  "repeats": 10,
+  "runtime_budget_minutes": 60,
+  "runtime_safety_factor": 1.5,
+  "runtime_reserve_seconds": 60,
+  "minimum_repeats": 3
+}

@@ -1,7 +1,7 @@
 import os
 # Set to True to force CPU-only execution for CPU-runtime measurements.
 # Set to False to allow to use available GPUs.
-FORCE_CPU_ONLY = False
+FORCE_CPU_ONLY = True
 if FORCE_CPU_ONLY:
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
@@ -49,12 +49,12 @@ for collection_path in sorted(collections_root.iterdir()):
         )
 
     time_start = time.time()
-    scUNVEIL.set_input_anndata(collection_adata, batch_size=BATCH_SIZE)
+    result = scUNVEIL.process_anndata(collection_adata, batch_size=BATCH_SIZE)
 
-    embeddings = scUNVEIL.get_embeddings(n_features=None)
+    embeddings = result.get_embeddings(n_features=None)
     time_emb = time.time() - time_start
 
-    marker_imputation = scUNVEIL.get_specific_genes_imputation(PBMC_50_MARKERS, batch_size=BATCH_SIZE)
+    marker_imputation = result.get_specific_genes_imputation(PBMC_50_MARKERS, batch_size=BATCH_SIZE)
     time_impute = time.time() - time_start
 
     if collection_path.name == 'Hao_PBMC' and FORCE_CPU_ONLY and LIMIT_N_CELLS is None:

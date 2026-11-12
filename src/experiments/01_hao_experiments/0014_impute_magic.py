@@ -27,7 +27,7 @@ sc.pp.log1p(adata)
 magic_op = magic.MAGIC(
     solver='approximate',   # landmark-based, scales to 100k+ cells
     n_jobs=-1,              # use all cores
-    verbose=1,              # so you can see progress
+    verbose=1,              # so the progress can be monitored
 )
 
 start_time = time.time()
